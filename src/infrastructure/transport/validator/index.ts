@@ -3,6 +3,8 @@ import { z } from 'zod';
 import { exceptionResponse, response } from '../../commons/response';
 import { UnprocessableEntityError } from '../../commons/exceptions';
 import { userSchema, loginSchema } from './AuthSchema';
+import { swipeSchema } from './SwipeSchema';
+import { messageSchema } from './MessageSchema';
 
 const validateBody = (schema: z.ZodObject<any, any>) => {
   return (req: Request, res: Response, next: NextFunction) => {
@@ -31,4 +33,4 @@ const validateBody = (schema: z.ZodObject<any, any>) => {
 };
 
 export default validateBody;
-export { userSchema, loginSchema };
+export { userSchema, loginSchema, swipeSchema, messageSchema };
