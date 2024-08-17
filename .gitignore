@@ -172,3 +172,4 @@ dist
 .cli
 api-*.json
 src/infrastructure/repository/prisma/migrations
+src/infrastructure/repository/gsheet
