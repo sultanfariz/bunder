@@ -85,6 +85,7 @@ model Message {
   matchId    Int
   senderId   Int
   receiverId Int
+  content    String
   isRead     Boolean
   timestamp  DateTime
 
