@@ -4,11 +4,6 @@ import {
   getUserByEmail,
   updateUser,
 } from '../infrastructure/repository/prisma/user/repository';
-import {
-  updateAdmin,
-  getAdminByUserId,
-} from '../infrastructure/repository/prisma/admin/repository';
-import * as userSheet from '../infrastructure/repository/gsheet/user/repository';
 import prisma from '../infrastructure/repository/prisma/driver';
 import {
   response,
@@ -22,8 +17,17 @@ import {
 
 const register = async (req: Request, res: Response) => {
   try {
-    return await prisma.$transaction(async (tx) => {
-      const { email, password, name } = req.body;
+    return await prisma.$transaction(async (tx: any) => {
+      const {
+        email,
+        password,
+        name,
+        birthdate,
+        gender,
+        location,
+        bio,
+        hobbies,
+      } = req.body;
 
       const user = await getUserByEmail(email);
       if (user) {
@@ -34,7 +38,12 @@ const register = async (req: Request, res: Response) => {
         email,
         password: await Bun.password.hash(password),
         name,
-        photoUrl:
+        birthdate: new Date(birthdate),
+        gender,
+        location,
+        bio,
+        hobbies,
+        photoUrls:
           'https://eu.ui-avatars.com/api/?name=' +
           name.replace(/\s/g, '+') +
           '&size=250',
@@ -44,12 +53,23 @@ const register = async (req: Request, res: Response) => {
         data,
       });
 
-      await userSheet.insertUser({
-        id: createdUser.id,
-        email: createdUser.email,
-        name: createdUser.name || '',
-        photoUrl: createdUser.photoUrl || '',
-        role: createdUser.role,
+      // create subscription for basic plan
+      await tx.subscription.create({
+        data: {
+          userId: createdUser.id,
+          packageId: 1,
+          startDate: new Date(),
+        },
+      });
+
+      // create basic preferences
+      await tx.preference.create({
+        data: {
+          userId: createdUser.id,
+          minAge: 18,
+          maxAge: 100,
+          maxDistance: 50000,
+        },
       });
 
       return response(res, {
@@ -65,8 +85,6 @@ const register = async (req: Request, res: Response) => {
 };
 
 const login = async (req: Request, res: Response) => {
-  let roleStr = 'user';
-
   try {
     const { email, password } = req.body;
 
@@ -82,35 +100,16 @@ const login = async (req: Request, res: Response) => {
       id: user.id,
       email: user.email,
       name: user.name,
-      role: user.role,
     };
 
     let accessToken = jwt.sign(payload, process.env.TOKEN || '', {
       expiresIn: process.env.TOKEN_EXPIRED,
     });
 
-    if (user.role === 'ADMIN') {
-      const admin = await getAdminByUserId(user.id);
-      if (!admin) {
-        throw new UnauthorizedError('Email or password is incorrect!');
-      }
-
-      await updateAdmin(admin.id, {
-        lastLogin: new Date(),
-      });
-
-      if (admin) {
-        accessToken = jwt.sign(payload, process.env.TOKEN || '', {
-          expiresIn: process.env.TOKEN_EXPIRED,
-        });
-        roleStr = 'admin';
-      }
-    }
-
     return res.status(200).json({
       code: 200,
       success: true,
-      message: `Successfully login ${roleStr}!`,
+      message: `Successfully login ${user.name}!`,
       content: accessToken,
     });
   } catch (error: any) {
@@ -146,7 +145,7 @@ const addProfilePhoto = async (req: Request, res: Response) => {
       id: updatedUser.id,
       email: updatedUser.email,
       name: updatedUser.name,
-      photoUrl: updatedUser.photoUrl,
+      photoUrls: updatedUser.photoUrls,
     };
 
     return response(res, {

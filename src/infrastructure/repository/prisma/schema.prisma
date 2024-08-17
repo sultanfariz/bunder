@@ -22,10 +22,9 @@ enum Gender {
 
 model User {
   id        Int     @id @default(autoincrement())
-  packageId Int   
   email     String  @unique
   name      String
-  age       Int
+  birthdate DateTime
   password  String
   photoUrls String
   gender    Gender
@@ -34,20 +33,31 @@ model User {
   hobbies   String?
 
   preference Preference? @relation(name: "user")
-  package   Package @relation(fields: [packageId], references: [id], name: "package")
   swipes    Swipe[] @relation(name: "user")
   candidates Swipe[] @relation(name: "candidate")
   sentMessages Message[] @relation(name: "sender")
   receivedMessages Message[] @relation(name: "receiver")
+  subscription Subscription? @relation(name: "user")
 }
 
 model Package {
   id           Int    @id @default(autoincrement())
   name         String
   swipeQuota   Int
-  verifiedLabel String
+  verifiedLabel Boolean
 
-  users        User[] @relation(name: "package")
+  subscriptions Subscription[] @relation(name: "package")
+}
+
+model Subscription {
+  id           Int    @id @default(autoincrement())
+  packageId    Int
+  userId       Int    @unique
+  startDate    DateTime
+  endDate      DateTime?
+
+  user        User @relation(fields: [userId], references: [id], name: "user")
+  package     Package @relation(fields: [packageId], references: [id], name: "package")
 }
 
 model Swipe {
@@ -61,14 +71,14 @@ model Swipe {
   candidate   User    @relation(fields: [candidateId], references: [id], name: "candidate")
 }
 
-  model Match {
-    id        Int     @id @default(autoincrement())
-    firstId   Int
-    secondId  Int
-    timestamp DateTime
+model Match {
+  id        Int     @id @default(autoincrement())
+  firstId   Int
+  secondId  Int
+  timestamp DateTime
 
-    messages Message[] @relation(name: "match")
-  }
+  messages Message[] @relation(name: "match")
+}
 
 model Message {
   id         Int     @id @default(autoincrement())

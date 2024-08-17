@@ -29,19 +29,50 @@ const updateUser = async (id: number, data: any) => {
   }
 };
 
-const getUsers = async () => {
+const getProfiles = async () => {
   try {
-    const users = await prisma.user.findMany({
+    const profiles = await prisma.user.findMany({
       select: {
         id: true,
-        email: true,
         name: true,
-        photoUrl: true,
-        role: true,
+        gender: true,
+        location: true,
+        photoUrls: true,
+        birthdate: true,
+        hobbies: true,
+        bio: true,
+        // subscription: true,
       },
     });
 
-    return users;
+    return profiles;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+const getProfilesWithSubs = async () => {
+  try {
+    const profiles = await prisma.user.findMany({
+      select: {
+        id: true,
+        name: true,
+        gender: true,
+        location: true,
+        photoUrls: true,
+        birthdate: true,
+        hobbies: true,
+        bio: true,
+        subscription: {
+          select: {
+            packageId: true,
+            endDate: true,
+          },
+        },
+      },
+    });
+
+    return profiles;
   } catch (error: any) {
     throw error;
   }
@@ -61,4 +92,25 @@ const getUserByEmail = async (email: string) => {
   }
 };
 
-export { insertUser, updateUser, getUsers, getUserByEmail };
+const getUserById = async (userId: number) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
+    return user;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+export {
+  insertUser,
+  updateUser,
+  getProfiles,
+  getProfilesWithSubs,
+  getUserByEmail,
+  getUserById,
+};

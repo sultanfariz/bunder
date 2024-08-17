@@ -1,11 +1,14 @@
-// declare model user so we could pass it as type of user repository param
 type User = {
-  id: number | null;
+  id?: number;
   email: string;
   password: string;
-  name: string | null;
-  photoUrl: string | null;
-  role: string;
+  name: string;
+  age: number;
+  photoUrls: string;
+  gender: string;
+  location: string;
+  bio: string;
+  hobbies: string[];
 };
 
 export { User };
