@@ -1,9 +1,9 @@
 import { PrismaClient } from '@prisma/client';
-import { Preference } from './model';
+import { Preference, InsertPreference } from './model';
 
 const prisma = new PrismaClient();
 
-const insertPreference = async (data: Preference) => {
+const insertPreference = async (data: InsertPreference) => {
   try {
     const createdPreference = await prisma.preference.create({
       data: data,
@@ -15,32 +15,28 @@ const insertPreference = async (data: Preference) => {
   }
 };
 
-// const updatePreference = async (id: number, data: any) => {
-//   try {
-//     const updatedPreference = await prisma.preference.update({
-//       where: {
-//         id: id,
-//       },
-//       data: data,
-//     });
+const updatePreference = async (id: number, data: Preference) => {
+  try {
+    const updatedPreference = await prisma.preference.update({
+      where: {
+        id: id,
+      },
+      data: {
+        minAge: data.minAge,
+        maxAge: data.maxAge,
+        maxDistance: data.maxDistance,
+      },
+    });
 
-//     return updatedPreference;
-//   } catch (error: any) {
-//     throw error;
-//   }
-// };
+    return updatedPreference;
+  } catch (error: any) {
+    throw error;
+  }
+};
 
 const getPreferences = async () => {
   try {
-    const preferences = await prisma.preference.findMany({
-      // select: {
-      //   id: true,
-      //   email: true,
-      //   name: true,
-      //   photoUrl: true,
-      //   role: true,
-      // },
-    });
+    const preferences = await prisma.preference.findMany({});
 
     return preferences;
   } catch (error: any) {
@@ -62,4 +58,9 @@ const getPreferenceByUser = async (userId: number) => {
   }
 };
 
-export { insertPreference, getPreferences, getPreferenceByUser };
+export {
+  insertPreference,
+  updatePreference,
+  getPreferences,
+  getPreferenceByUser,
+};
