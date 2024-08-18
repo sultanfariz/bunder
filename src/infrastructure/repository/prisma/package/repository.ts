@@ -14,32 +14,9 @@ const insertPackage = async (data: any) => {
   }
 };
 
-// const updatePackage = async (id: number, data: any) => {
-//   try {
-//     const updatedPackage = await prisma.package.update({
-//       where: {
-//         id: id,
-//       },
-//       data: data,
-//     });
-
-//     return updatedPackage;
-//   } catch (error: any) {
-//     throw error;
-//   }
-// };
-
 const getPackages = async () => {
   try {
-    const packages = await prisma.package.findMany({
-      // select: {
-      //   id: true,
-      //   email: true,
-      //   name: true,
-      //   photoUrl: true,
-      //   role: true,
-      // },
-    });
+    const packages = await prisma.package.findMany({});
 
     return packages;
   } catch (error: any) {
