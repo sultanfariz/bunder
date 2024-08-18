@@ -1,14 +1,27 @@
+enum Gender {
+  MALE = 'MALE',
+  FEMALE = 'FEMALE',
+}
+
 type User = {
   id?: number;
   email: string;
   password: string;
   name: string;
-  age: number;
+  birthdate: Date;
   photoUrls: string;
-  gender: string;
+  gender: Gender;
   location: string;
   bio: string;
-  hobbies: string[];
+  hobbies: string;
 };
 
-export { User };
+type Profile = {
+  name: string;
+  birthdate: Date;
+  location: string;
+  bio: string;
+  hobbies: string;
+};
+
+export { User, Profile };

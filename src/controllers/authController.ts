@@ -2,7 +2,8 @@ import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import {
   getUserByEmail,
-  updateUser,
+  addProfilePhotos,
+  getProfileById,
 } from '../infrastructure/repository/prisma/user/repository';
 import prisma from '../infrastructure/repository/prisma/driver';
 import {
@@ -43,10 +44,11 @@ const register = async (req: Request, res: Response) => {
         location,
         bio,
         hobbies,
-        photoUrls:
-          'https://eu.ui-avatars.com/api/?name=' +
-          name.replace(/\s/g, '+') +
-          '&size=250',
+        photoUrls: '',
+        // photoUrls:
+        //   'https://eu.ui-avatars.com/api/?name=' +
+        //   name.replace(/\s/g, '+') +
+        //   '&size=250',
       };
 
       const createdUser = await tx.user.create({
@@ -119,9 +121,8 @@ const login = async (req: Request, res: Response) => {
 
 const addProfilePhoto = async (req: Request, res: Response) => {
   try {
-    const { email } = res.locals.user;
-    console.log('email', email);
-    if (!email) {
+    const { id: userId } = res.locals.user;
+    if (!userId) {
       throw new UnauthorizedError('Unauthorized!');
     }
 
@@ -130,16 +131,17 @@ const addProfilePhoto = async (req: Request, res: Response) => {
       throw new UnprocessableEntityError('Image is required!');
     }
 
-    const data = {
-      photoUrl: process.env.UPLOAD_PATH + image.filename,
-    };
+    const photoUrl = process.env.UPLOAD_PATH + image.filename;
 
-    const user = await getUserByEmail(email);
+    const user = await getProfileById(userId);
     if (!user) {
       throw new UnauthorizedError('Unauthorized!');
     }
 
-    const updatedUser = await updateUser(user.id, data);
+    const newPhotoUrls =
+      user.photoUrls === '' ? photoUrl : user.photoUrls + ',' + photoUrl;
+
+    const updatedUser = await addProfilePhotos(user.id, newPhotoUrls);
 
     const payload = {
       id: updatedUser.id,
