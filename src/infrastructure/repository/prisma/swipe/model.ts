@@ -1,7 +1,4 @@
-enum SwipeDirection {
-  LEFT = 'LEFT',
-  RIGHT = 'RIGHT',
-}
+import { SwipeDirection } from '../driver';
 
 type Swipe = {
   id?: number;

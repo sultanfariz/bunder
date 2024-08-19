@@ -1,7 +1,4 @@
-enum Gender {
-  MALE = 'MALE',
-  FEMALE = 'FEMALE',
-}
+import { Gender } from '../driver';
 
 type User = {
   id?: number;

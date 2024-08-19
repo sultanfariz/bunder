@@ -32,7 +32,7 @@ async function fetchLocationByCoordinates(
   lat: number,
   lon: number
 ): Promise<Location> {
-  const url = `https://nominatim.openstreetmap.org/reverse?email=hydeblazack@gmail.com&format=json&lat=${lat}&lon=${lon}`;
+  const url = `https://nominatim.openstreetmap.org/reverse?email=sultanfariz00@gmail.com&format=json&lat=${lat}&lon=${lon}`;
 
   try {
     const response = await axios.get(url);

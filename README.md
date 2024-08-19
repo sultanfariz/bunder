@@ -32,6 +32,7 @@ bun install
 ```bash
 cd src/infrastructure/repository/prisma
 npx prisma migrate dev --name init
+bunx prisma generate
 ```
 
 5. To start the development server:
